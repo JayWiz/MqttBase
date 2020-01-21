@@ -1,8 +1,9 @@
 #include "MqttBase.h"
 
-MqttBase::MqttBase(const char* mqtt_server, uint16_t mqtt_port) {
+MqttBase::MqttBase(const char* mqtt_server, const char* mqtt_client_name, uint16_t mqtt_port) {
   mqtt_server_ = mqtt_server;
   mqtt_port_ = mqtt_port;
+  mqtt_client_name_ = mqtt_client_name;
 }
 
 MqttBase::~MqttBase() {}
@@ -36,7 +37,7 @@ void MqttBase::reconnect() {
   while (!pub_client_->connected()) {
     debug_print("Attempting MQTT connection...");
     // Attempt to connect
-    if (pub_client_->connect("ESP32Client")) {
+    if (pub_client_->connect(mqtt_client_name_)) {
       debug_println("connected");
       // Subscribe
       for (uint8_t i = 0; i < mqtt_topics_.size(); i++) {

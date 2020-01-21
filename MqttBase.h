@@ -12,6 +12,7 @@ class MqttBase {
 
   // const char* mqtt_topic_;
   const char* mqtt_server_;
+  const char* mqtt_client_name_;
   int mqtt_port_ = 1883;
   StaticJsonDocument<300> doc_;
   JsonObject JSONencoder_ = doc_.to<JsonObject>();
@@ -27,7 +28,7 @@ class MqttBase {
   void debug_println(int i);
 
  public:
-  MqttBase(const char* mqtt_server, uint16_t mqtt_port);
+  MqttBase(const char* mqtt_server,const char* mqtt_client_name, uint16_t mqtt_port);
   ~MqttBase();
 
   void init(const char* ssid, const char* password,
