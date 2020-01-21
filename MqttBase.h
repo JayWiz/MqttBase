@@ -39,5 +39,5 @@ class MqttBase {
   virtual void publish(const char* topic, const char* methode, const char* state, bool retained);
   void loop();
 
-  bool get_mqtt_status(return pub_client_->connected(););
+  bool get_mqtt_status(){return pub_client_->connected();}
 };
