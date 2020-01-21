@@ -67,8 +67,8 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
   }
 
   debug_print(". Message: ");
-  String messageTemp;
   /*
+  String messageTemp;
     for (int i = 0; i < length; i++) {
       debug_print((char)message[i]);
       messageTemp += (char)message[i];
@@ -92,11 +92,9 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
       logic_callbacks_[i](method1, state, daten);
     }
   }
-
-  // logic_callback_(method1, state, daten);
 }
-/*
-void MqttBase::publish(const char* methode, const char* state) {
+
+void MqttBase::publish(const char* topic, const char* methode, const char* state) {
   JSONencoder_["method"] = methode;
   JSONencoder_["state"] = state;
   JSONencoder_["data"] = 0;
@@ -107,9 +105,9 @@ void MqttBase::publish(const char* methode, const char* state) {
   debug_print("send message");
   debug_println(JSONencoder_);
 
-  pub_client_->publish(mqtt_topic_, JSONmessageBuffer);
+  pub_client_->publish(topic, JSONmessageBuffer);
 }
-*/
+
 void MqttBase::debug_print(const char* str) {
 #ifdef DEBUG
   Serial.print(str);
