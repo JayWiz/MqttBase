@@ -7,9 +7,10 @@ MqttBase::MqttBase(const char* mqtt_server, uint16_t mqtt_port) {
 
 MqttBase::~MqttBase() {}
 
-void MqttBase::init(const char* ssid, const char* password, const char* topic,
-                    void (*logic_callback)(const char*, const char*, int)) {
-  mqtt_topic_ = topic;
+void MqttBase::init(
+    const char* ssid, const char* password, std::vector<std::shared_ptr<std::string>>& mqtt_topics,
+    std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks) {
+  mqtt_topics_ = mqtt_topics;
   Serial.print("CONNECT TO WIFI");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -25,8 +26,10 @@ void MqttBase::init(const char* ssid, const char* password, const char* topic,
   pub_client_->setCallback([this](char* topic, byte* payload, unsigned int length) {
     this->callback(topic, payload, length);
   });
-  pub_client_->subscribe(mqtt_topic_);
-  this->logic_callback_ = logic_callback;
+  for (uint8_t i = 0; i < mqtt_topics_.size(); i++) {
+    pub_client_->subscribe(mqtt_topics_[i]->c_str());
+  }
+  this->logic_callbacks_ = logic_callbacks;
 }
 
 void MqttBase::reconnect() {
@@ -36,7 +39,9 @@ void MqttBase::reconnect() {
     if (pub_client_->connect("ESP32Client")) {
       debug_println("connected");
       // Subscribe
-      pub_client_->subscribe(mqtt_topic_);
+      for (uint8_t i = 0; i < mqtt_topics_.size(); i++) {
+        pub_client_->subscribe(mqtt_topics_[i]->c_str());
+      }
     } else {
       debug_print("failed, rc=");
       debug_print(pub_client_->state());
@@ -56,16 +61,19 @@ void MqttBase::loop() {
 
 void MqttBase::callback(char* topic, byte* message, unsigned int length) {
   debug_print("Message arrived on topic: ");
-  debug_print(mqtt_topic_);
+  for (uint8_t i = 0; i < mqtt_topics_.size(); i++) {
+    debug_print(mqtt_topics_[i]->c_str());
+  }
+
   debug_print(". Message: ");
   String messageTemp;
-/*
-  for (int i = 0; i < length; i++) {
-    debug_print((char)message[i]);
-    messageTemp += (char)message[i];
-  }
-  debug_println("");
-*/
+  /*
+    for (int i = 0; i < length; i++) {
+      debug_print((char)message[i]);
+      messageTemp += (char)message[i];
+    }
+    debug_println("");
+  */
   deserializeJson(doc_, message);
   const char* method1 = doc_["method"];
   const char* state = doc_["state"];
@@ -78,9 +86,15 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
   debug_print("Daten: ");
   debug_println(daten);
 
-  logic_callback_(method1, state, daten);
-}
+  for (uint8_t i = 0; i < logic_callbacks_.size(); i++) {
+    if (strcmp(topic, mqtt_topics_[i]->c_str()) == 0) {
+      logic_callbacks_[i](method1, state, daten);
+    }
+  }
 
+  // logic_callback_(method1, state, daten);
+}
+/*
 void MqttBase::publish(const char* methode, const char* state) {
   JSONencoder_["method"] = methode;
   JSONencoder_["state"] = state;
@@ -91,9 +105,10 @@ void MqttBase::publish(const char* methode, const char* state) {
   serializeJson(doc_, JSONmessageBuffer, 100);
   debug_print("send message");
   debug_println(JSONencoder_);
+
   pub_client_->publish(mqtt_topic_, JSONmessageBuffer);
 }
-
+*/
 void MqttBase::debug_print(const char* str) {
 #ifdef DEBUG
   Serial.print(str);

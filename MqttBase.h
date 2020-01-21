@@ -1,12 +1,16 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
+#include <vector>
 
 #define DEBUG
 
 class MqttBase {
  private:
-  const char* mqtt_topic_;
+  std::vector<std::shared_ptr<std::string>> mqtt_topics_;
+  std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks_;
+
+  // const char* mqtt_topic_;
   const char* mqtt_server_;
   int mqtt_port_ = 1883;
   StaticJsonDocument<300> doc_;
@@ -15,7 +19,7 @@ class MqttBase {
   PubSubClient* pub_client_;
   WiFiClient* wifi_client_;
 
-  std::function<void(const char*, const char*, int)> logic_callback_;
+  // std::function<void(const char*, const char*, int)> logic_callback_;
 
   void debug_print(const char* str);
   void debug_print(int i);
@@ -26,11 +30,11 @@ class MqttBase {
   MqttBase(const char* mqtt_server, uint16_t mqtt_port);
   ~MqttBase();
 
-  void init(const char* ssid, const char* password, const char* topic,
-            void (*f)(const char*, const char*, int));
+  void init(const char* ssid, const char* password,
+            std::vector<std::shared_ptr<std::string>>& mqtt_topics,
+            std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks);
   void reconnect();
   virtual void callback(char* topic, byte* message, unsigned int length);
-  virtual void publish(const char* methode, const char* state);
+  // virtual void publish(const char* methode, const char* state);
   void loop();
-  
 };
