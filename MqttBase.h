@@ -37,6 +37,7 @@ class MqttBase {
   void reconnect();
   virtual void callback(char* topic, byte* message, unsigned int length);
   virtual void publish(const char* topic, const char* methode, const char* state, bool retained);
+  virtual void publish(const char* topic, const char* methode, const char* state, int data, bool retained);
   void loop();
 
   bool get_mqtt_status(){return pub_client_->connected();}
