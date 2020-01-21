@@ -20,8 +20,6 @@ class MqttBase {
   PubSubClient* pub_client_;
   WiFiClient* wifi_client_;
 
-  bool get_mqtt_status(return pub_client_->connected(););
-
   // std::function<void(const char*, const char*, int)> logic_callback_;
 
   void debug_print(const char* str);
@@ -38,6 +36,8 @@ class MqttBase {
             std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks);
   void reconnect();
   virtual void callback(char* topic, byte* message, unsigned int length);
-  virtual void publish(const char* topic, const char* methode, const char* state);
+  virtual void publish(const char* topic, const char* methode, const char* state, bool retained);
   void loop();
+
+  bool get_mqtt_status(return pub_client_->connected(););
 };

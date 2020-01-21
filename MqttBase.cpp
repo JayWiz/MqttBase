@@ -94,7 +94,7 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
   }
 }
 
-void MqttBase::publish(const char* topic, const char* methode, const char* state) {
+void MqttBase::publish(const char* topic, const char* methode, const char* state, bool retained) {
   JSONencoder_["method"] = methode;
   JSONencoder_["state"] = state;
   JSONencoder_["data"] = 0;
@@ -105,7 +105,7 @@ void MqttBase::publish(const char* topic, const char* methode, const char* state
   debug_print("send message");
   debug_println(JSONencoder_);
 
-  pub_client_->publish(topic, JSONmessageBuffer);
+  pub_client_->publish(topic, JSONmessageBuffer, retained);
 }
 
 void MqttBase::debug_print(const char* str) {
