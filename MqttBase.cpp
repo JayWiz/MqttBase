@@ -18,13 +18,13 @@ void MqttBase::init(
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     debug_print(".");
-    if(counter > 10){
+    if (counter > 10) {
       WiFi.disconnect();
       delay(1000);
       WiFi.begin(ssid, password);
       counter = 0;
     }
-    counter ++;
+    counter++;
   }
   debug_println("CONNECTED");
 
@@ -70,19 +70,10 @@ void MqttBase::loop() {
 
 void MqttBase::callback(char* topic, byte* message, unsigned int length) {
   debug_print("Message arrived on topic: ");
-  for (uint8_t i = 0; i < mqtt_topics_.size(); i++) {
-    debug_print(mqtt_topics_[i]->c_str());
-  }
+  debug_print(topic);
 
   debug_print(". Message: ");
-  /*
-  String messageTemp;
-    for (int i = 0; i < length; i++) {
-      debug_print((char)message[i]);
-      messageTemp += (char)message[i];
-    }
-    debug_println("");
-  */
+
   deserializeJson(doc_, message);
   const char* method1 = doc_["method"];
   const char* state = doc_["state"];
@@ -102,7 +93,8 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
   }
 }
 
-void MqttBase::publish(const char* topic, const char* methode, const char* state, int data, bool retained) {
+void MqttBase::publish(const char* topic, const char* methode, const char* state, int data,
+                       bool retained) {
   JSONencoder_["method"] = methode;
   JSONencoder_["state"] = state;
   JSONencoder_["data"] = data;

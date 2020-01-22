@@ -3,8 +3,6 @@
 #include <WiFi.h>
 #include <vector>
 
-#define DEBUG
-
 class MqttBase {
  private:
   std::vector<std::shared_ptr<std::string>> mqtt_topics_;
