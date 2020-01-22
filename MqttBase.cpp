@@ -14,9 +14,16 @@ void MqttBase::init(
   mqtt_topics_ = mqtt_topics;
   Serial.print("CONNECT TO WIFI");
   WiFi.begin(ssid, password);
+  int counter = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     debug_print(".");
+    if(counter > 10){
+      WiFi.disconnect();
+      delay(1000);
+      WiFi.begin(ssid, password);
+    }
+    counter ++;
   }
   debug_println("CONNECTED");
 
