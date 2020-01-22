@@ -22,6 +22,7 @@ void MqttBase::init(
       WiFi.disconnect();
       delay(1000);
       WiFi.begin(ssid, password);
+      counter = 0;
     }
     counter ++;
   }
