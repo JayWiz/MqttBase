@@ -104,7 +104,7 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
       debug_println(daten);
 
       for (uint8_t i = 0; i < logic_callbacks_.size(); i++) {
-        if (strcmp(topic, mqtt_topics_[i]->c_str()) == 0) {
+        if (caseInSensStringCompare(topic, mqtt_topics_[i]->c_str())) {
           logic_callbacks_[i](method1, state, daten);
         }
       }
@@ -180,4 +180,21 @@ void MqttBase::debug_println(int i) {
 #ifdef DEBUG
   Serial.println(i);
 #endif
+}
+
+bool compareChar(char & c1, char & c2)
+{
+	if (c1 == c2)
+		return true;
+	else if (std::toupper(c1) == std::toupper(c2))
+		return true;
+	return false;
+}
+
+bool caseInSensStringCompare(const char* in1, const char* in2)
+{
+  std::string str1 = in1;
+  std::string str2 = in2;
+	return ( (str1.size() == str2.size() ) &&
+			 std::equal(str1.begin(), str1.end(), str2.begin(), &compareChar) );
 }

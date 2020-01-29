@@ -3,6 +3,10 @@
 #include <WiFi.h>
 #include <vector>
 
+/** Case insensitive string compare */
+bool compareChar(char & c1, char & c2);
+bool caseInSensStringCompare(const char* in1, const char* in2);
+
 class MqttBase {
  private:
   std::vector<std::shared_ptr<std::string>> mqtt_topics_;
@@ -43,3 +47,5 @@ class MqttBase {
 
   bool get_mqtt_status() { return pub_client_->connected(); }
 };
+
+
