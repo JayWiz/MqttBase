@@ -74,22 +74,44 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
 
   debug_print(". Message: ");
 
-  deserializeJson(doc_, message);
-  const char* method1 = doc_["method"];
-  const char* state = doc_["state"];
-  int daten = doc_["data"];
-
-  debug_print("Methode: ");
-  debug_println(method1);
-  debug_print("State: ");
-  debug_println(state);
-  debug_print("Daten: ");
-  debug_println(daten);
-
-  for (uint8_t i = 0; i < logic_callbacks_.size(); i++) {
-    if (strcmp(topic, mqtt_topics_[i]->c_str()) == 0) {
-      logic_callbacks_[i](method1, state, daten);
+  // just parse message if it contains at least 6 elements
+  if (length > 6) {
+    DeserializationError err = deserializeJson(doc_, message);
+    switch (err.code()) {
+      case DeserializationError::Ok:
+        debug_println("Deserialization succeeded");
+        break;
+      case DeserializationError::InvalidInput:
+        debug_println("Invalid input!");
+        break;
+      case DeserializationError::NoMemory:
+        debug_println("Not enough memory");
+        break;
+      default:
+        debug_println("Deserialization failed");
+        break;
     }
+    if (err.code() == DeserializationError::Ok) {
+      const char* method1 = doc_["method"];
+      const char* state = doc_["state"];
+      int daten = doc_["data"];
+
+      debug_print("Methode: ");
+      debug_println(method1);
+      debug_print("State: ");
+      debug_println(state);
+      debug_print("Daten: ");
+      debug_println(daten);
+
+      for (uint8_t i = 0; i < logic_callbacks_.size(); i++) {
+        if (strcmp(topic, mqtt_topics_[i]->c_str()) == 0) {
+          logic_callbacks_[i](method1, state, daten);
+        }
+      }
+    }
+  }
+  else{
+    debug_println("Received message too short! Not parsed.");
   }
 }
 
