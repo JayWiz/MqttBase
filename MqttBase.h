@@ -4,13 +4,13 @@
 #include <vector>
 
 /** Case insensitive string compare */
-bool compareChar(char & c1, char & c2);
+bool compareChar(char& c1, char& c2);
 bool caseInSensStringCompare(const char* in1, const char* in2);
 
 class MqttBase {
  private:
   std::vector<std::shared_ptr<std::string>> mqtt_topics_;
-  std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks_;
+  std::vector<std::function<void(const char*, const char*, const char*)>> logic_callbacks_;
 
   // const char* mqtt_topic_;
   const char* mqtt_server_;
@@ -33,9 +33,10 @@ class MqttBase {
   MqttBase(const char* mqtt_server, const char* mqtt_client_name, uint16_t mqtt_port);
   ~MqttBase();
 
-  void init(const char* ssid, const char* password,
-            std::vector<std::shared_ptr<std::string>>& mqtt_topics,
-            std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks);
+  void init(
+      const char* ssid, const char* password,
+      std::vector<std::shared_ptr<std::string>>& mqtt_topics,
+      std::vector<std::function<void(const char*, const char*, const char*)>> logic_callbacks);
   void reconnect();
   virtual void callback(char* topic, byte* message, unsigned int length);
   virtual void publish(const char* topic, const char* methode, const char* state, bool retained);
@@ -47,5 +48,3 @@ class MqttBase {
 
   bool get_mqtt_status() { return pub_client_->connected(); }
 };
-
-
