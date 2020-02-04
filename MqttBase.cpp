@@ -10,7 +10,7 @@ MqttBase::~MqttBase() {}
 
 void MqttBase::init(
     const char* ssid, const char* password, std::vector<std::shared_ptr<std::string>>& mqtt_topics,
-    std::vector<std::function<void(const char*, const char*, const char*)>> logic_callbacks) {
+    std::vector<std::function<void(const char*, const char*, int)>> logic_callbacks) {
   mqtt_topics_ = mqtt_topics;
   Serial.print("CONNECT TO WIFI");
   WiFi.begin(ssid, password);
@@ -94,7 +94,7 @@ void MqttBase::callback(char* topic, byte* message, unsigned int length) {
     if (err.code() == DeserializationError::Ok) {
       const char* method1 = doc_["method"];
       const char* state = doc_["state"];
-      const char* daten = doc_["data"];
+      int daten = doc_["data"];
 
       debug_print("Methode: ");
       debug_println(method1);
